@@ -3,6 +3,7 @@ const { rejects } = require("assert");
 const { resolve } = require("path");
 const readLine = require("readline");
 const validator = require("validator");
+const yargs = require("yargs");
 
 const rl = readLine.createInterface({
   input: process.stdin,
@@ -30,10 +31,15 @@ const tulisPertanyaan = (pertanyaan) => {
   });
 };
 
-const simpanContact = (nama, email, noHP) => {
-  const contact = { nama, email, noHP };
+const loadContact = () => {
   const file = fs.readFileSync("data/contacts.json", "utf-8");
   const contacts = JSON.parse(file);
+  return contacts;
+};
+
+const simpanContact = (nama, email, noHP) => {
+  const contact = { nama, email, noHP };
+  const contacts = loadContact();
 
   // Cek duplikat
   const duplikat = contacts.find((contact) => contact.nama === nama);
@@ -66,4 +72,39 @@ const simpanContact = (nama, email, noHP) => {
   rl.close();
 };
 
-module.exports = { tulisPertanyaan, simpanContact };
+// Menampilkan daftar semua nama & no HP contact
+const listContact = () => {
+  const contacts = loadContact();
+
+  if (contacts.length > 0) {
+    console.log("Daftar Kontak : ");
+    contacts.forEach((contact, i) => {
+      console.log(`${i + 1}. ${contact.nama} - ${contact.noHP}`);
+    });
+  } else {
+    console.log("Tidak ada kontak yang tersedia.");
+  }
+
+  rl.close();
+};
+
+const detailContact = (nama) => {
+  const contacts = loadContact();
+
+  const contact = contacts.find(
+    (contact) => contact.nama.toLowerCase() === nama.toLowerCase()
+  );
+
+  if (!contact) {
+    console.log(`Kontak "${nama}" tidak ditemukan.`);
+    rl.close();
+    return false;
+  }
+
+  console.log(contact.nama);
+  console.log(contact.noHP);
+  console.log(contact.email);
+  rl.close();
+};
+
+module.exports = { tulisPertanyaan, simpanContact, listContact, detailContact };
