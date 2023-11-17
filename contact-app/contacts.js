@@ -107,4 +107,30 @@ const detailContact = (nama) => {
   rl.close();
 };
 
-module.exports = { tulisPertanyaan, simpanContact, listContact, detailContact };
+// Menghapus contact berdasarkan nama
+const deleteContact = (nama) => {
+  const contacts = loadContact();
+
+  const newContacts = contacts.filter(
+    (contact) => contact.nama.toLowerCase() !== nama.toLowerCase()
+  ); // Kalau pakai find, pencariannya akan berhenti ketika ia menemukan nama yang dicari. Kalau pakai filter, pencariannya akan tetap berjalan sampai akhir.
+
+  if (contacts.length === newContacts.length) {
+    console.log(`Kontak "${nama}" tidak ditemukan.`);
+    rl.close();
+    return false;
+  }
+
+  fs.writeFileSync("data/contacts.json", JSON.stringify(newContacts));
+  console.log(`Kontak "${nama}" berhasil dihapus.`);
+  rl.close();
+};
+
+// Mengekspor seluruh function yang dibuat di sini agar bisa digunakan di file lain
+module.exports = {
+  tulisPertanyaan,
+  simpanContact,
+  listContact,
+  detailContact,
+  deleteContact,
+};
